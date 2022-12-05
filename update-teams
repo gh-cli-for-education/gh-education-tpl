@@ -2,6 +2,8 @@ ORG="$2"
 
 QUERY='query getInfo($organization: String!) {
   organization(login: $organization) {
+    name
+    url
     teams(first: 100) {
       totalCount
       edges {
@@ -12,10 +14,11 @@ QUERY='query getInfo($organization: String!) {
             edges {
               memberAccessUrl
               node {
-                name
+								name
                 url
                 email
-                login               
+                login
+                avatarUrl
               }
             }
           }
