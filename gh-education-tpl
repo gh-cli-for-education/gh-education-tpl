@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+
 ## VARIABLES GENERALES ##
 PATH=$PATH:"WebSite/app"
 FILEPATH=$PWD"/clone"
+TEAMSPATH=$FILEPATH"/vite-education/docs/.vitepress/publico/"
+arr=("")
 
 ### Colors ##
 ESC=$(printf '\033') RESET="${ESC}[0m" BLACK="${ESC}[30m" RED="${ESC}[31m"
@@ -43,8 +46,9 @@ cloneRepo() {
     echo -ne "\n $(printcolor $GREEN 'Clone completed succesfullly' ) \n"
 }
 
-createTeams() {
-    progressbar 'printcolor' "$CYAN" 'Creating Organization & Teams' & pid="$!"
+updateTeams() {
+    progressbar 'printcolor' "$CYAN" 'Updating Teams from Organization' & pid="$!"
+    getTeams=$(./update-teams $TEAMSPATH/teams.js ${arr[3]})
     kill -s USR1 "$pid"
 }
 
@@ -63,11 +67,19 @@ basicConfig() {
     read -r opt
     arr+=(${opt})
 
+    opt=""
+    echo -ne "$(printcolor $CYAN '3)' ) Nombre Organización\n"
+    echo -ne "   "
+    read -r opt
+    arr+=(${opt})
+
+
     echo -ne "\ec"
     echo -ne "
         $(printcolor $YELLOW '# INFOROMACIÓN CONFIGURACIÓN #' )
         $(printcolor $CYAN 'Nombre asignatura: ' ) ${arr[1]} 
         $(printcolor $CYAN 'Curso: ' ) ${arr[2]} 
+        $(printcolor $CYAN 'Organización: ' ) ${arr[3]} 
     "
 }
 
@@ -78,7 +90,7 @@ menuOptions() {
         echo -ne "
         $(printcolor $YELLOW '# CONFIGURACIÓN ASIGNATURA #' )
         $(printcolor $CYAN '1)' ) Configuración básica
-        $(printcolor $MAGENTA '2)' ) Crear Teams & Organización
+        $(printcolor $MAGENTA '2)' ) Actualizar Teams
         $(printcolor $RED '0)' ) Exit
         Choose an option:  "
             read -r ans
@@ -89,7 +101,7 @@ menuOptions() {
                 ;;
             2)
                 echo -en "\ec"
-                createTeams
+                updateTeams
                 ;;
             3)
                 echo -ne "\ec"
@@ -113,7 +125,6 @@ initialmenu() {
         echo -ne "
         $(printcolor $YELLOW '# OPCIONES DISPONIBLES #' )
         $(printcolor $CYAN '1)' ) Crear Template
-        $(printcolor $MAGENTA '2)' ) Actualizar Teams
         $(printcolor $RED '0)' ) Exit
         Choose an option:  "
             read -r ans
@@ -122,13 +133,6 @@ initialmenu() {
                 echo -en "\ec"
                 cloneRepo
                 menuOptions
-                ;;
-            2)
-                echo -en "\ec"
-                createTeams
-                ;;
-            3)
-                echo -ne "\ec"
                 ;;
             0)
                 echo -ne "$(printcolor $RED 'exiting...' )"
