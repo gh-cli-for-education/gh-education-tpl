@@ -53,34 +53,50 @@ updateTeams() {
 }
 
 basicConfig() {
-    arr=("")
-    opt=""
 
-    echo -ne "$(printcolor $CYAN '1)' ) Nombre Asignatura\n"
-    echo -ne "   "
-    read -r opt
-    arr+=(${opt})
+    exit="no"
 
-    opt=""
-    echo -ne "$(printcolor $CYAN '2)' ) Curso\n"
-    echo -ne "   "
-    read -r opt
-    arr+=(${opt})
+    while [ "$exit" != "si" ]
+    do
+        arr=("")
+        opt=""
 
-    opt=""
-    echo -ne "$(printcolor $CYAN '3)' ) Nombre Organización\n"
-    echo -ne "   "
-    read -r opt
-    arr+=(${opt})
+        echo -ne "$(printcolor $CYAN '1)' ) Nombre Asignatura\n"
+        echo -ne "   "
+        read -r opt
+        arr+=(${opt})
+
+        opt=""
+        echo -ne "$(printcolor $CYAN '2)' ) Curso\n"
+        echo -ne "   "
+        read -r opt
+        arr+=(${opt})
+
+        opt=""
+        echo -ne "$(printcolor $CYAN '3)' ) Nombre Organización\n"
+        echo -ne "   "
+        read -r opt
+        arr+=(${opt})
 
 
+        echo -ne "\ec"
+        echo -ne "
+            $(printcolor $YELLOW '# INFOROMACIÓN CONFIGURACIÓN #' )
+            $(printcolor $CYAN 'Nombre asignatura: ' ) ${arr[1]} 
+            $(printcolor $CYAN 'Curso: ' ) ${arr[2]} 
+            $(printcolor $CYAN 'Organización: ' ) ${arr[3]} 
+        "
+        
+        echo -ne " 
+            $(printcolor $YELLOW '# ¿INFOROMACIÓN CORRECTA? #' ) 
+            $(printcolor $GREEN '- si' ) 
+            $(printcolor $RED '- no' )         
+        "
+
+        read -r exit
+    done
+    
     echo -ne "\ec"
-    echo -ne "
-        $(printcolor $YELLOW '# INFOROMACIÓN CONFIGURACIÓN #' )
-        $(printcolor $CYAN 'Nombre asignatura: ' ) ${arr[1]} 
-        $(printcolor $CYAN 'Curso: ' ) ${arr[2]} 
-        $(printcolor $CYAN 'Organización: ' ) ${arr[3]} 
-    "
 }
 
 menuOptions() {
@@ -89,17 +105,12 @@ menuOptions() {
     do
         echo -ne "
         $(printcolor $YELLOW '# CONFIGURACIÓN ASIGNATURA #' )
-        $(printcolor $CYAN '1)' ) Configuración básica
-        $(printcolor $MAGENTA '2)' ) Actualizar Teams
+        $(printcolor $MAGENTA '1)' ) Actualizar Teams
         $(printcolor $RED '0)' ) Exit
         Choose an option:  "
             read -r ans
             case $ans in
             1)
-                echo -en "\ec"
-                basicConfig
-                ;;
-            2)
                 echo -en "\ec"
                 updateTeams
                 ;;
@@ -131,7 +142,11 @@ initialmenu() {
             case $ans in
             1)
                 echo -en "\ec"
-                cloneRepo
+                cloneRepo    
+
+                echo -en "\ec"
+                basicConfig
+
                 menuOptions
                 ;;
             0)

@@ -19,6 +19,17 @@ QUERY='query getInfo($organization: String!) {
                 email
                 login
                 avatarUrl
+                websiteUrl
+                projectsUrl
+                repositories (first: 3) {
+                  totalCount
+                  edges {
+                    node {
+                      name
+                      url
+                    }
+                  }
+                }
               }
             }
           }

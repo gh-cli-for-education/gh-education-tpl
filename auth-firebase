@@ -1,0 +1,49 @@
+
+
+### Colors ##
+ESC=$(printf '\033') RESET="${ESC}[0m" BLACK="${ESC}[30m" RED="${ESC}[31m"
+GREEN="${ESC}[32m" YELLOW="${ESC}[33m" BLUE="${ESC}[34m" MAGENTA="${ESC}[35m"
+CYAN="${ESC}[36m" WHITE="${ESC}[37m" DEFAULT="${ESC}[39m" GRAY="${ESC}[38m"
+
+### Color Functions ##
+printcolor() { printf "$1%s${RESET}\n" "$2"; }
+
+progressbar () {
+    trap 'break' USR1
+    echo -ne ""$2" "$3""
+    while echo -ne ""$2"." >&2; do
+        sleep 0.25
+    done
+}
+
+environment() {
+    
+    echo -ne "$(printcolor $YELLOW '# INSTALANDO DEPENDENCIAS #' )\n"   
+    progressbar 'printcolor' "$GREEN" 'Instalando' & pid="$!"
+    
+    installNPM="npm install"
+    installNPMRun=$($installNPM 2>&1)
+
+    kill -s USR1 "$pid"
+    echo -ne "\n" 
+    
+    echo -ne "$(printcolor $YELLOW '# FIREBASE LOGIN #' )\n" 
+    echo -ne "$(printcolor $CYAN 'i' ) " 
+    echo -ne "$(printcolor $GRAY 'Pulsa enter para abrir el navegador y autenticarse:' )" 
+    firebaseLogin='firebase login'
+    firebaseUser='firebase login:list'
+    firebaseInit='firebase init'
+
+    $($firebaseLogin > /dev/null 2>&1)
+    userLogged=$($firebaseUser 2>&1)
+
+    echo -ne "\n" 
+    echo "$userLogged"
+
+    set -x
+    $($firebaseInit 2>&1)
+    set +x
+}
+
+echo -en "\ec"
+environment

@@ -1,0 +1,19 @@
+{
+  "name": "gh-education-tpl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gh-cli-for-education/gh-education-tpl.git"
+  },
+  "author": "Carlos Díaz Calzadilla",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gh-cli-for-education/gh-education-tpl/issues"
+  },
+  "homepage": "https://github.com/gh-cli-for-education/gh-education-tpl#readme"
+}
