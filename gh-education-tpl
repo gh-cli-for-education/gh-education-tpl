@@ -4,6 +4,9 @@
 PATH=$PATH:"WebSite/app"
 FILEPATH=$PWD"/clone"
 TEAMSPATH=$FILEPATH"/vite-education/docs/.vitepress/publico/"
+VITEDUPATH=$FILEPATH"/vite-education"
+VITEPRESSPATH=$FILEPATH"/vite-education/docs/.vitepress"
+DOCSPATH=$FILEPATH"/vite-education/docs/"
 arr=("")
 
 ### Colors ##
@@ -37,7 +40,7 @@ checkFolder() {
 cloneRepo() {
     echo -e "\n"
     checkFolder
-    echo -ne "$(printcolor $YELLOW "Conning in ${FILEPATH}" )"
+    echo -ne "$(printcolor $YELLOW "Clonning in ${FILEPATH}" )"
     echo -e "\n"
     progressbar 'printcolor' "$CYAN" 'Clonning' & pid="$!"
     cloneCmd="git clone git@github.com:gh-cli-for-education/gh-education.git ${FILEPATH}"
@@ -61,7 +64,7 @@ basicConfig() {
         arr=("")
         opt=""
 
-        echo -ne "$(printcolor $CYAN '1)' ) Nombre Asignatura\n"
+        echo -ne "$(printcolor $YELLOW '# INFOROMACIÓN CONFIGURACIÓN #' )\n$(printcolor $CYAN '1)' ) Nombre Asignatura\n"
         echo -ne "   "
         read -r opt
         arr+=(${opt})
@@ -80,23 +83,69 @@ basicConfig() {
 
 
         echo -ne "\ec"
-        echo -ne "
-            $(printcolor $YELLOW '# INFOROMACIÓN CONFIGURACIÓN #' )
-            $(printcolor $CYAN 'Nombre asignatura: ' ) ${arr[1]} 
-            $(printcolor $CYAN 'Curso: ' ) ${arr[2]} 
-            $(printcolor $CYAN 'Organización: ' ) ${arr[3]} 
-        "
+        echo -ne "$(printcolor $YELLOW '# INFOROMACIÓN CONFIGURACIÓN #' )\n"
+        echo -ne "$(printcolor $CYAN 'Nombre asignatura: ' ) ${arr[1]} \n"
+        echo -ne "$(printcolor $CYAN 'Curso: ' ) ${arr[2]} \n"
+        echo -ne "$(printcolor $CYAN 'Organización: ' ) ${arr[3]}  \n"
         
-        echo -ne " 
-            $(printcolor $YELLOW '# ¿INFOROMACIÓN CORRECTA? #' ) 
-            $(printcolor $GREEN '- si' ) 
-            $(printcolor $RED '- no' )         
-        "
+        echo -ne "$(printcolor $YELLOW '# ¿INFOROMACIÓN CORRECTA? #' ) \n"
+        echo -ne "$(printcolor $GREEN ' - si' ) \n"
+        echo -ne "$(printcolor $RED ' - no' ) \n"
 
         read -r exit
     done
     
+
+    auth
     echo -ne "\ec"
+}
+
+npmInstall() {    
+    
+    echo -ne "$(printcolor $YELLOW '# INSTALANDO DEPENDENCIAS #' )\n"   
+    progressbar 'printcolor' "$GREEN" 'Instalando' & pid="$!"
+    
+    installNPM="npm install"
+    installNPMRun=$($installNPM 2>&1)
+
+    kill -s USR1 "$pid"
+    echo -ne "\n" 
+
+}
+
+auth() {
+
+    echo -ne "$(printcolor $GREEN '# CONFIGURACIÓN FIREBASE #' )\n\n"  
+    
+    npmInstall
+
+    cd $VITEPRESSPATH
+
+    echo -ne "$(printcolor $YELLOW '# FIREBASE LOGIN #' )\n" 
+    firebase login
+
+    echo -ne "$(printcolor $YELLOW '# CREACIÓN PROYECTO #' )\n" 
+    echo -ne "$(printcolor $CYAN '# Project ID: (enter para nombre por defecto)' )" 
+    echo -ne " mínimo 6 caracteres\n" 
+    echo -ne "$(printcolor $RED '# Debug Log:' )" 
+    echo -ne " firebase-debug.log\n" 
+    firebase init hosting
+    
+    echo -ne "$(printcolor $YELLOW '# PRESIONA ENTER PARA SALIR #' )\n" 
+    read -r 
+
+    echo -ne "$(printcolor $YELLOW '# DEPLOY DEL TEMPLATE #' )\n" 
+
+    cd $VITEDUPATH
+    npmInstall
+
+    npm run docs:build
+
+    cd $VITEPRESSPATH
+
+    firebase deploy --only hosting
+    read -r 
+
 }
 
 menuOptions() {
@@ -135,7 +184,7 @@ initialmenu() {
     do
         echo -ne "
         $(printcolor $YELLOW '# OPCIONES DISPONIBLES #' )
-        $(printcolor $CYAN '1)' ) Crear Template
+        $(printcolor $CYAN '1)' ) Clonar plantilla y configurar
         $(printcolor $RED '0)' ) Exit
         Choose an option:  "
             read -r ans
