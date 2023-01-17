@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-## VARIABLES GENERALES ##
+## INTERNAL VAR ##
+VERSION="1.0.0"
+NEXTVERSION=$(echo ${VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}')
+
+## GENERAL VAR ##
 PATH=$PATH:"WebSite/app"
 FILEPATH=$PWD"/clone"
 TEAMSPATH=$FILEPATH"/vite-education/docs/.vitepress/publico/"
@@ -124,6 +128,8 @@ auth() {
     echo -ne "$(printcolor $YELLOW '# FIREBASE LOGIN #' )\n" 
     firebase login
 
+    mv "firebase.json" "/clone/$VITEPRESSPATH"
+
     echo -ne "$(printcolor $YELLOW '# FIREBASE PROJECT CREATION #' )\n" 
     echo -ne "$(printcolor $CYAN '# Project ID: (enter for a default name)' )" 
     echo -ne " more the 6 characters\n" 
@@ -133,6 +139,7 @@ auth() {
     
     echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
     read -r 
+
 
     # firebase apps:create [options] [platform] [displayName]
 
@@ -215,4 +222,27 @@ initialmenu() {
 }
 
 echo -en "\ec"
-initialmenu
+
+case $1 in
+
+    "--version")
+        echo -ne "$(printcolor $BLUE '# Current Version' ) -> $VERSION\n"    
+        ;;
+
+    "--help")
+        echo -ne "$(printcolor $YELLOW '# HELP MENU # ' )\n"
+        echo -ne "$(printcolor $BLUE '  --version ' ) -> Show the program version\n"          
+        echo -ne "$(printcolor $BLUE '  --manual ' )    -> Show the manual\n"    
+        echo -ne "$(printcolor $BLUE '  --help ' )    -> Show the program help\n"
+
+        ;;
+
+    "--manual")
+        man "./manual"
+        ;;
+
+    *)
+        initialmenu
+        ;;
+
+esac

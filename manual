@@ -1,0 +1,17 @@
+.\" Manpage for gh-education-tpl script.
+.\" Contact carlosdiazcalzadilla@hotmail.com to correct errors or typos.
+.TH man 8 "17 Jan 23" "1.0" "gh-education-tpl man page"
+.SH NAME
+gh-education-tpl \- create an online template for teachers
+.SH SYNOPSIS
+gh-education-tpl [OPTIONS]
+.SH DESCRIPTION
+gh-education-tpl is an aplication developed for teachers. This create an online site template for teachers, allowing to use firebase to have auth, and storage of the student accounts. Also, it have a teams section that is connected with github orgs, having there all the organization teams.
+.SH OPTIONS
+  --version -> Show the program version
+  --help -> Show the program help
+  --manual -> Show the manual
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Carlos Díaz Calzadilla (carlosdiazcalzadilla@hotmail.com)
