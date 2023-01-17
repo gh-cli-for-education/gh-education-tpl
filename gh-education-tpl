@@ -64,32 +64,32 @@ basicConfig() {
         arr=("")
         opt=""
 
-        echo -ne "$(printcolor $YELLOW '# INFOROMACIÓN CONFIGURACIÓN #' )\n$(printcolor $CYAN '1)' ) Nombre Asignatura\n"
+        echo -ne "$(printcolor $YELLOW '# PROJECT INITIAL CONFIGURATION #' )\n$(printcolor $CYAN '1)' ) Subject name\n"
         echo -ne "   "
         read -r opt
         arr+=(${opt})
 
         opt=""
-        echo -ne "$(printcolor $CYAN '2)' ) Curso\n"
+        echo -ne "$(printcolor $CYAN '2)' ) Academic year\n"
         echo -ne "   "
         read -r opt
         arr+=(${opt})
 
         opt=""
-        echo -ne "$(printcolor $CYAN '3)' ) Nombre Organización\n"
+        echo -ne "$(printcolor $CYAN '3)' ) Github Organization\n"
         echo -ne "   "
         read -r opt
         arr+=(${opt})
 
 
         echo -ne "\ec"
-        echo -ne "$(printcolor $YELLOW '# INFOROMACIÓN CONFIGURACIÓN #' )\n"
-        echo -ne "$(printcolor $CYAN 'Nombre asignatura: ' ) ${arr[1]} \n"
-        echo -ne "$(printcolor $CYAN 'Curso: ' ) ${arr[2]} \n"
-        echo -ne "$(printcolor $CYAN 'Organización: ' ) ${arr[3]}  \n"
+        echo -ne "$(printcolor $YELLOW '# PROJECT INITIAL CONFIGURATION #' )\n"
+        echo -ne "$(printcolor $CYAN 'Subject name: ' ) ${arr[1]} \n"
+        echo -ne "$(printcolor $CYAN 'Academic year: ' ) ${arr[2]} \n"
+        echo -ne "$(printcolor $CYAN 'Github Organization: ' ) ${arr[3]}  \n"
         
-        echo -ne "$(printcolor $YELLOW '# ¿INFOROMACIÓN CORRECTA? #' ) \n"
-        echo -ne "$(printcolor $GREEN ' - si' ) \n"
+        echo -ne "$(printcolor $YELLOW '# ALL CORRECT? #' ) \n"
+        echo -ne "$(printcolor $GREEN ' - yes' ) \n"
         echo -ne "$(printcolor $RED ' - no' ) \n"
 
         read -r exit
@@ -102,8 +102,8 @@ basicConfig() {
 
 npmInstall() {    
     
-    echo -ne "$(printcolor $YELLOW '# INSTALANDO DEPENDENCIAS #' )\n"   
-    progressbar 'printcolor' "$GREEN" 'Instalando' & pid="$!"
+    echo -ne "$(printcolor $YELLOW '# INSTALLING AND CHECKING DEPENDENCIES #' )\n"   
+    progressbar 'printcolor' "$GREEN" 'Installing' & pid="$!"
     
     installNPM="npm install"
     installNPMRun=$($installNPM 2>&1)
@@ -115,26 +115,30 @@ npmInstall() {
 
 auth() {
 
-    echo -ne "$(printcolor $GREEN '# CONFIGURACIÓN FIREBASE #' )\n\n"  
+    echo -ne "$(printcolor $GREEN '# FIREBASE CONFIGURATION #' )\n\n"  
     
-    npmInstall
+    npm install
 
     cd $VITEPRESSPATH
 
     echo -ne "$(printcolor $YELLOW '# FIREBASE LOGIN #' )\n" 
     firebase login
 
-    echo -ne "$(printcolor $YELLOW '# CREACIÓN PROYECTO #' )\n" 
-    echo -ne "$(printcolor $CYAN '# Project ID: (enter para nombre por defecto)' )" 
-    echo -ne " mínimo 6 caracteres\n" 
+    echo -ne "$(printcolor $YELLOW '# FIREBASE PROJECT CREATION #' )\n" 
+    echo -ne "$(printcolor $CYAN '# Project ID: (enter for a default name)' )" 
+    echo -ne " more the 6 characters\n" 
     echo -ne "$(printcolor $RED '# Debug Log:' )" 
     echo -ne " firebase-debug.log\n" 
     firebase init hosting
     
-    echo -ne "$(printcolor $YELLOW '# PRESIONA ENTER PARA SALIR #' )\n" 
+    echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
     read -r 
 
-    echo -ne "$(printcolor $YELLOW '# DEPLOY DEL TEMPLATE #' )\n" 
+    # firebase apps:create [options] [platform] [displayName]
+
+    # firebase apps:sdkconfig [options] [platform] [appId]
+
+    echo -ne "$(printcolor $YELLOW '# TEMPLATE DEPLOY #' )\n" 
 
     cd $VITEDUPATH
     npmInstall
@@ -153,8 +157,8 @@ menuOptions() {
     while [ $ans -ne 0 ]
     do
         echo -ne "
-        $(printcolor $YELLOW '# CONFIGURACIÓN ASIGNATURA #' )
-        $(printcolor $MAGENTA '1)' ) Actualizar Teams
+        $(printcolor $YELLOW '# TEMPLATE CONFIGURATION #' )
+        $(printcolor $MAGENTA '1)' ) Refresh Org Teams
         $(printcolor $RED '0)' ) Exit
         Choose an option:  "
             read -r ans
@@ -183,8 +187,8 @@ initialmenu() {
     while [ $ans -ne 0 ]
     do
         echo -ne "
-        $(printcolor $YELLOW '# OPCIONES DISPONIBLES #' )
-        $(printcolor $CYAN '1)' ) Clonar plantilla y configurar
+        $(printcolor $YELLOW '# AVAILABLE OPTIONS #' )
+        $(printcolor $CYAN '1)' ) Clone and config template
         $(printcolor $RED '0)' ) Exit
         Choose an option:  "
             read -r ans

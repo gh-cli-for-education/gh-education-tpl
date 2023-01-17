@@ -21,12 +21,14 @@ QUERY='query getInfo($organization: String!) {
                 avatarUrl
                 websiteUrl
                 projectsUrl
-                repositories (first: 3) {
-                  totalCount
-                  edges {
-                    node {
-                      name
-                      url
+                organization(login: $organization) {
+                  repositories (first: 10) {
+                    totalCount
+                    edges {
+                      node {
+                        name
+                        url
+                      }
                     }
                   }
                 }
