@@ -31,6 +31,8 @@ progressbar () {
     done
 }
 
+
+## TO-DO Check this function
 checkFolder() {
     if [ -d "${FILEPATH}" ]; 
         echo -ne "$(printcolor $RED 'Clone folder found' )"
@@ -63,6 +65,7 @@ basicConfig() {
 
     exit="no"
 
+    # TO DO - Allow yes, Yes, YES
     while [ "$exit" != "yes" ]
     do
         arr=("")
@@ -130,14 +133,13 @@ auth() {
     echo -ne "$(printcolor $YELLOW '# FIREBASE LOGIN #' )\n" 
     firebase login
 
-    mv "firebase.json" "/clone/$VITEPRESSPATH"
-
     echo -ne "$(printcolor $YELLOW '# FIREBASE PROJECT CREATION #' )\n" 
     echo -ne "$(printcolor $CYAN '# Project ID: (enter for a default name)' )" 
     echo -ne " more the 6 characters\n" 
     echo -ne "$(printcolor $RED '# Debug Log:' )" 
     echo -ne " firebase-debug.log\n" 
-    firebase init hosting
+
+    firebase init hosting --config "$FILEPATH/$VITEPRESSPATH/firebase.json"
     
     echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
     read -r 
