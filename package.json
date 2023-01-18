@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/gh-cli-for-education/gh-education-tpl/issues"
   },
-  "homepage": "https://github.com/gh-cli-for-education/gh-education-tpl#readme"
+  "homepage": "https://github.com/gh-cli-for-education/gh-education-tpl#readme",
+  "dependencies": {
+    "firebase": "^9.15.0"
+  }
 }

@@ -63,7 +63,7 @@ basicConfig() {
 
     exit="no"
 
-    while [ "$exit" != "si" ]
+    while [ "$exit" != "yes" ]
     do
         arr=("")
         opt=""
@@ -121,6 +121,8 @@ auth() {
 
     echo -ne "$(printcolor $GREEN '# FIREBASE CONFIGURATION #' )\n\n"  
     
+    cd $DOCSPATH
+
     npm install
 
     cd $VITEPRESSPATH
@@ -139,7 +141,6 @@ auth() {
     
     echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
     read -r 
-
 
     # firebase apps:create [options] [platform] [displayName]
 
