@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# - - GENERAL VARS - - #
+ESC=$(printf '\033') RESET="${ESC}[0m" BLACK="${ESC}[30m" RED="${ESC}[31m"
+GREEN="${ESC}[32m" YELLOW="${ESC}[33m" BLUE="${ESC}[34m" MAGENTA="${ESC}[35m"
+CYAN="${ESC}[36m" WHITE="${ESC}[37m" DEFAULT="${ESC}[39m" GRAY="${ESC}[38m"
+
+# - - GENERAL FUNCTIONS - - #
+function getCursorPosition() { 
+    IFS=';' read -sdR -p $'\E[6n' ROW COL; echo ${ROW#*[};
+}
+
+function setCursorPosition() {
+    printf "$ESC[$1;${2:-1}H";
+}
+
+function setKeyInput() {
+    read -s -n3 inputKey 2>/dev/null >&2
+    if [[ $inputKey = $ESC[A ]]; then echo up;    fi
+    if [[ $inputKey = $ESC[B ]]; then echo down;  fi
+    if [[ $inputKey = ""     ]]; then echo enter; fi
+}
+
+function rowOfSymbols() {
+    initialCol=$1
+    maxCol=$2
+
+    for (( cols=initialCol; cols<=maxCol/2; cols++))
+    do
+        printf "* "
+    done
+}
+
+function displayTextCenter() {
+    columns=$(tput cols)
+    center=$(((${#1}+$columns)/2))
+    printf "* "
+    printf "%*s" $(((${#1}+$columns)/2)) "$1"
+    printf "%*s\n" $(($columns-$center-3)) "*"
+}
+
+function displayTextRight() {
+    columns=$(tput cols)
+    str=$2
+    printf "* %s" "$2"
+    if [[ $1 = 0 ]] 
+    then
+        printf "%*s\n" $(($columns-${#str}-3)) "*"
+    else
+        printf "%*s\n" $(($columns-${#str}+6)) "*"
+    fi
+}
+
+function chooseOption() {
+
+    for opt; do printf "\n"; done
+
+    local rowNumber=`getCursorPosition`
+    local firstRow=$(($rowNumber - $#))
+
+    local currentOption=0
+    while true; do
+        local optionIndex=0
+        for opt; do
+            setCursorPosition $(($firstRow + $optionIndex))
+            if [ $optionIndex -eq $currentOption ]; then
+                displayTextRight 1 " [$((optionIndex+1))]   $ESC[7m $opt $ESC[27m ";
+            else
+                displayTextRight 0 " [$((optionIndex+1))]    $opt ";
+            fi            
+            displayTextCenter " "
+            rowOfSymbols 1 maxCols
+            ((optionIndex++))
+        done
+
+        case `setKeyInput` in
+            enter) break;;
+            up)    ((currentOption--));
+                   if [ $currentOption -lt 0 ]; then currentOption=$(($# - 1)); fi;;
+            down)  ((currentOption++));
+                   if [ $currentOption -ge $# ]; then currentOption=0; fi;;
+        esac
+    done   
+
+    setCursorPosition $rowNumber
+    printf "\n"
+
+    return $currentOption
+}
