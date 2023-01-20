@@ -3,7 +3,8 @@
 # - - GENERAL VARS - - #
 ESC=$(printf '\033') RESET="${ESC}[0m" BLACK="${ESC}[30m" RED="${ESC}[31m"
 GREEN="${ESC}[32m" YELLOW="${ESC}[33m" BLUE="${ESC}[34m" MAGENTA="${ESC}[35m"
-CYAN="${ESC}[36m" WHITE="${ESC}[37m" DEFAULT="${ESC}[39m" GRAY="${ESC}[38m"
+CYAN="${ESC}[36m" WHITE="${ESC}[97m" DEFAULT="${ESC}[39m" GRAY="${ESC}[38m"
+SYMBOL="*"
 
 # - - GENERAL FUNCTIONS - - #
 function getCursorPosition() { 
@@ -27,27 +28,27 @@ function rowOfSymbols() {
 
     for (( cols=initialCol; cols<=maxCol/2; cols++))
     do
-        printf "* "
+        printf "${SYMBOL} "
     done
 }
 
 function displayTextCenter() {
     columns=$(tput cols)
     center=$(((${#1}+$columns)/2))
-    printf "* "
-    printf "%*s" $(((${#1}+$columns)/2)) "$1"
-    printf "%*s\n" $(($columns-$center-3)) "*"
+    printf "${SYMBOL} "
+    printf "${YELLOW}%*s${RESET}" $(((${#1}+$columns)/2)) "$1"
+    printf "%*s\n" $(($columns-$center-3)) "${SYMBOL}"
 }
 
 function displayTextRight() {
     columns=$(tput cols)
     str=$2
-    printf "* %s" "$2"
+    printf "${SYMBOL} %s" "$2"
     if [[ $1 = 0 ]] 
     then
-        printf "%*s\n" $(($columns-${#str}-3)) "*"
+        printf "%*s\n" $(($columns-${#str}-3)) "${SYMBOL}"
     else
-        printf "%*s\n" $(($columns-${#str}+6)) "*"
+        printf "%*s\n" $(($columns-${#str}+6)) "${SYMBOL}"
     fi
 }
 
