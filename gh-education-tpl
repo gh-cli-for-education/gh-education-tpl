@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
-. $PWD/menu-tpl
+## TO DO - Get the path of the scriot
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+source $SCRIPTPATH/menu-tpl
 
 ## INTERNAL VAR ##
 VERSION="1.0.0"
 NEXTVERSION=$(echo ${VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}')
+
+## TO DO - Fix errors from ctrl + c or ctrl + d
 
 ## GENERAL VAR ##
 FILEPATH=$PWD"/clone"
@@ -166,6 +170,13 @@ auth() {
                 firebase use projectID
                 ;;
         esac
+
+        options=("Create new project" "List existing projects" "Change current project" "Exit")
+
+        printf "\033c"
+        setMenu "# FIREBASE PROJECT CREATION #"
+        chooseOption "${options[@]}"
+        choice=$?
     done
     
     firebase apps:sdkconfig WEB --project projectID --json > ./firebase-config.json
