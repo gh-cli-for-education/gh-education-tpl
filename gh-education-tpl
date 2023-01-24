@@ -38,18 +38,20 @@ progressbar() {
 
 
 checkFolder() {
-    echo -ne "$(printcolor $YELLOW '# CLONING TEMPLATE #' )"
-    echo -e "\n"
     if [ -d ${FILEPATH} ]; then
         echo -ne "$(printcolor $RED 'Clone folder found' )"
         progressbar 'printcolor' "$RED" 'Deleting' & pid="$!"
         rm -Rf ${FILEPATH}; 
         kill -s USR1 "$pid"
         echo -ne "\n"
+        return true
     fi
+    return false
 }
 
 cloneRepo() {
+    echo -ne "$(printcolor $YELLOW '# CLONING TEMPLATE #' )"
+    echo -e "\n"
     checkFolder
     echo -e "\n"
     echo -ne "$(printcolor $YELLOW "Cloning in ${FILEPATH}" )"
@@ -145,38 +147,44 @@ auth() {
     setMenu "# FIREBASE PROJECT CREATION #"
     chooseOption "${options[@]}"
     choice=$?
+    exit=1
     
-    while [ $choice != 0 ]
+    while [ $exit != 0 ]
     do
         printf "\033c"
         case $choice in
             0)
+                printf "\033c"
                 echo -ne "$(printcolor $CYAN '# Project ID: (enter for a default name)' )" 
-                echo -ne " more the 6 characters\n ->" 
-                proejctID=""
+                echo -ne " more the 6 characters\n -> " 
+                projectID=""
                 read -r projectID
-                firebase projects:create projectID
-                firebase apps:create WEB projectID              
+                echo $projectID
+                firebase projects:create $projectID  
+                firebase use $projectID
+                firebase apps:create WEB $projectID 
+                exit=0             
                 ;;
             1)
                 firebase projects:list
                 echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
                 read -r 
+
+                options=("Create new project" "List existing projects" "Change current project" "Exit")
+
+                printf "\033c"
+                setMenu "# FIREBASE PROJECT CREATION #"
+                chooseOption "${options[@]}"
+                choice=$?
                 ;;
             2)       
                 echo -ne "$(printcolor $CYAN '# Project ID to change: ' )"
                 proejctID=""
                 read -r projectID         
-                firebase use projectID
+                firebase use $projectID
+                exit=0             
                 ;;
         esac
-
-        options=("Create new project" "List existing projects" "Change current project" "Exit")
-
-        printf "\033c"
-        setMenu "# FIREBASE PROJECT CREATION #"
-        chooseOption "${options[@]}"
-        choice=$?
     done
     
     firebase apps:sdkconfig WEB --project projectID --json > ./firebase-config.json
@@ -231,10 +239,15 @@ templateConfiguration() {
 
 initialmenu() {
     options=("Clone and config template" "Exit")
+    if [ checkFolder ]; then
+        options=("Clone and config template" "Skip" "Exit")
+    fi
 
     setMenu "# AVAILABLE OPTIONS #"
     chooseOption "${options[@]}"
     choice=$?
+
+    # TO DO - Add skip if clone exists
 
     case $choice in
         0)
