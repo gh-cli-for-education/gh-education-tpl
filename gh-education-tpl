@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## TO DO - Get the path of the scriot
+## SCRIPT PATH ##
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 source $SCRIPTPATH/menu-tpl
 
@@ -23,11 +23,10 @@ ESC=$(printf '\033') RESET="${ESC}[0m" BLACK="${ESC}[30m" RED="${ESC}[31m"
 GREEN="${ESC}[32m" YELLOW="${ESC}[33m" BLUE="${ESC}[34m" MAGENTA="${ESC}[35m"
 CYAN="${ESC}[36m" WHITE="${ESC}[37m" DEFAULT="${ESC}[39m" GRAY="${ESC}[38m"
 
-### Color Functions ##
+### COLOR FUNCTION ##
 printcolor() { printf "$1%s${RESET}\n" "$2"; }
 
-## Main Functions ##
-
+## Progress bar for long running processes ##
 progressbar() {
     trap 'break' USR1
     echo -ne ""$2" "$3""
@@ -36,7 +35,7 @@ progressbar() {
     done
 }
 
-
+## Check if the clone folder has been downloaded before  ##
 checkFolder() {
     if [ -d ${FILEPATH} ]; then
         echo -ne "$(printcolor $RED 'Clone folder found' )"
@@ -49,6 +48,7 @@ checkFolder() {
     return false
 }
 
+## Take the template and clone it in the clone folder  ##
 cloneRepo() {
     echo -ne "$(printcolor $YELLOW '# CLONING TEMPLATE #' )"
     echo -e "\n"
@@ -63,17 +63,18 @@ cloneRepo() {
     echo -ne "\n $(printcolor $GREEN 'Clone completed succesfullly' ) \n"
 }
 
+## Update and write the teams of a organization into a file ##
 updateTeams() {
     progressbar 'printcolor' "$CYAN" 'Updating Teams from Organization' & pid="$!"
     getTeams=$(./update-teams $TEAMSPATH/teams.js ${arr[3]})
     kill -s USR1 "$pid"
 }
 
+## Project initial configuration ##
 basicConfig() {
 
     exit=1
 
-    # TO DO - Allow yes, Yes, YES
     while [ "$exit" != 0 ]
     do
         arr=("")
@@ -114,6 +115,7 @@ basicConfig() {
     echo -ne "\ec"
 }
 
+## Install npm packages usign the progress bar ##
 npmInstall() {    
     
     echo -ne "$(printcolor $YELLOW '# INSTALLING AND CHECKING DEPENDENCIES #' )\n"   
@@ -127,6 +129,7 @@ npmInstall() {
 
 }
 
+## Authentication in firebase + firebase project creation ##
 auth() {
     echo -ne "$(printcolor $GREEN '# FIREBASE CONFIGURATION #' )\n\n"  
     
@@ -191,6 +194,10 @@ auth() {
     echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
     read -r 
 
+}
+
+# Deployment of the site in firebase #
+deploy() {
     echo -ne "$(printcolor $YELLOW '# TEMPLATE DEPLOY #' )\n" 
 
     cd $VITEDUPATH
@@ -202,9 +209,9 @@ auth() {
 
     firebase deploy --only hosting
     read -r 
-
 }
 
+# Initial menu configuration #
 function setMenu() {
 
     maxCols=$(tput cols)
@@ -217,6 +224,7 @@ function setMenu() {
 
 }
 
+# Template configuration (update teams) #
 templateConfiguration() {
     echo -en "\ec"
     options=("Refresh Org Teams" "Exit")
@@ -237,6 +245,7 @@ templateConfiguration() {
     esac
 }
 
+# Initial menú clone or skip #
 initialmenu() {
     options=("Clone and config template" "Exit")
     if [ checkFolder ]; then
