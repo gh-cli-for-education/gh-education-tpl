@@ -7,14 +7,17 @@ CYAN="${ESC}[36m" WHITE="${ESC}[97m" DEFAULT="${ESC}[39m" GRAY="${ESC}[38m"
 SYMBOL="*"
 
 # - - GENERAL FUNCTIONS - - #
+# Get cursor position #
 function getCursorPosition() { 
     IFS=';' read -sdR -p $'\E[6n' ROW COL; echo ${ROW#*[};
 }
 
+# Change cursor position #
 function setCursorPosition() {
     printf "$ESC[$1;${2:-1}H";
 }
 
+# Get input key #
 function setKeyInput() {
     read -s -n3 inputKey 2>/dev/null >&2
     if [[ $inputKey = $ESC[A ]]; then echo up;    fi
@@ -22,6 +25,8 @@ function setKeyInput() {
     if [[ $inputKey = ""     ]]; then echo enter; fi
 }
 
+# - - DRAW FUNCTIONS - - #
+# Add row of symbols to beautify the menu #
 function rowOfSymbols() {
     initialCol=$1
     maxCol=$2
@@ -32,14 +37,16 @@ function rowOfSymbols() {
     done
 }
 
+# Display text centered in the menu #
 function displayTextCenter() {
     columns=$(tput cols)
-    center=$(((${#1}+$columns)/2))
+    center=$(((${#1}+$columns)/2)) # Get center position depending on number of columns
     printf "${SYMBOL} "
-    printf "${YELLOW}%*s${RESET}" $(((${#1}+$columns)/2)) "$1"
+    printf "${YELLOW}%*s${RESET}" $(((${#1}+$columns)/2)) "$1"  # Add text in the center
     printf "%*s\n" $(($columns-$center-3)) "${SYMBOL}"
 }
 
+# Display text right in the menu #
 function displayTextRight() {
     columns=$(tput cols)
     str=$2
@@ -52,22 +59,23 @@ function displayTextRight() {
     fi
 }
 
+# - - MAIN FUNCTION - - #
 function chooseOption() {
 
     for opt; do printf "\n"; done
 
-    local rowNumber=`getCursorPosition`
-    local firstRow=$(($rowNumber - $#))
+    local rowNumber=`getCursorPosition` # Get total number of rows
+    local firstRow=$(($rowNumber - $#)) # Get intial row of the menu
 
     local currentOption=0
     while true; do
         local optionIndex=0
         for opt; do
-            setCursorPosition $(($firstRow + $optionIndex))
+            setCursorPosition $(($firstRow + $optionIndex))  # Change cursor position to the new option
             if [ $optionIndex -eq $currentOption ]; then
-                displayTextRight 1 " [$((optionIndex+1))]   $ESC[7m $opt $ESC[27m ";
+                displayTextRight 1 " [$((optionIndex+1))]   $ESC[7m $opt $ESC[27m ";  # Selected option (white background)
             else
-                displayTextRight 0 " [$((optionIndex+1))]    $opt ";
+                displayTextRight 0 " [$((optionIndex+1))]    $opt ";  # Non selected option (no background color)
             fi            
             displayTextCenter " "
             rowOfSymbols 1 maxCols
@@ -75,11 +83,11 @@ function chooseOption() {
         done
 
         case `setKeyInput` in
-            enter) break;;
+            enter) break;; # Break while and eturn option choosed
             up)    ((currentOption--));
-                   if [ $currentOption -lt 0 ]; then currentOption=$(($# - 1)); fi;;
+                   if [ $currentOption -lt 0 ]; then currentOption=$(($# - 1)); fi;;  # Change choose option to upper one
             down)  ((currentOption++));
-                   if [ $currentOption -ge $# ]; then currentOption=0; fi;;
+                   if [ $currentOption -ge $# ]; then currentOption=0; fi;;  # Change choose option below
         esac
     done   
 
