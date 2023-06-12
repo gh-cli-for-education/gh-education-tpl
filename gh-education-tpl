@@ -12,11 +12,12 @@ NEXTVERSION=$(echo ${VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}')
 
 ## GENERAL VAR ##
 FILEPATH=$PWD"/clone"
-TEAMSPATH=$FILEPATH"/vite-education/docs/.vitepress/publico/"
+TEAMSPATH=$DOCSPATH"/public/data/"
 VITEDUPATH=$FILEPATH"/vite-education"
 VITEPRESSPATH=$FILEPATH"/vite-education/docs/.vitepress"
 DOCSPATH=$FILEPATH"/vite-education/docs/"
 arr=("")
+organization=""
 
 ### Colors ##
 ESC=$(printf '\033') RESET="${ESC}[0m" BLACK="${ESC}[30m" RED="${ESC}[31m"
@@ -45,7 +46,6 @@ checkFolder() {
         echo -ne "\n"
         return true
     fi
-    return false
 }
 
 ## Take the template and clone it in the clone folder  ##
@@ -66,7 +66,7 @@ cloneRepo() {
 ## Update and write the teams of a organization into a file ##
 updateTeams() {
     progressbar 'printcolor' "$CYAN" 'Updating Teams from Organization' & pid="$!"
-    getTeams=$(./update-teams $TEAMSPATH/teams.js ${arr[3]})
+    getTeams=$(./$PWD/update-teams update-teams $TEAMSPATH/teams.js ${arr[3]})
     kill -s USR1 "$pid"
 }
 
@@ -108,10 +108,11 @@ basicConfig() {
         options=("yes" "no")
         chooseOption "${options[@]}"
         exit=$?
-    done
-    
+    done    
 
+    organization=${arr[3]}
     auth
+    deploy $organization
     echo -ne "\ec"
 }
 
@@ -131,7 +132,7 @@ npmInstall() {
 
 ## Authentication in firebase + firebase project creation ##
 auth() {
-    echo -ne "$(printcolor $GREEN '# FIREBASE CONFIGURATION #' )\n\n"  
+    echo -ne "\n\n$(printcolor $GREEN '# FIREBASE CONFIGURATION #' )\n\n"  
     
     cd $DOCSPATH
 
@@ -200,15 +201,13 @@ auth() {
 deploy() {
     echo -ne "$(printcolor $YELLOW '# TEMPLATE DEPLOY #' )\n" 
 
+    opt=""
+    echo -ne "$(printcolor $CYAN '1)' ) Github Repository in the organization\n"
+    echo -ne "   "
+    read -r opt
+
     cd $VITEDUPATH
-    npmInstall
-
-    npm run docs:build
-
-    cd $VITEPRESSPATH
-
-    firebase deploy --only hosting
-    read -r 
+    deploy=$(./deploy.sh $1/$opt)
 }
 
 # Initial menu configuration #
@@ -249,7 +248,7 @@ templateConfiguration() {
 initialmenu() {
     options=("Clone and config template" "Exit")
     if [ checkFolder ]; then
-        options=("Clone and config template" "Skip" "Exit")
+        options=("Clone and config template" "Deploy" "Exit")
     fi
 
     setMenu "# AVAILABLE OPTIONS #"
@@ -270,6 +269,13 @@ initialmenu() {
             ;;
         1)
             echo -ne "\n"
+
+            org=""
+            echo -ne "$(printcolor $CYAN '1)' ) GitHub Organization\n"
+            echo -ne "   "
+            read -r org
+
+            deploy $org
             echo -ne "$(printcolor $RED 'exiting...' )"
             echo -ne "\n"
             exit 0
