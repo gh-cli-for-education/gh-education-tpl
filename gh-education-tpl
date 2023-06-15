@@ -213,6 +213,8 @@ auth() {
     done
     
     refreshFirebaseConfig $projectID
+    echo -ne "$(printcolor $CYAN '# COPIE LA URL DEL PROYECTO #' )"
+    echo -ne "$(printcolor $CYAN '# Siga el siguiente tutorial: ' https://github.com/gh-cli-for-education/gh-education#tutorial)"
     echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
     read -r 
 
