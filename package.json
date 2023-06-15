@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/gh-cli-for-education/gh-education-tpl#readme",
   "dependencies": {
-    "firebase": "^9.15.0"
+    "firebase": "9.22.0"
   }
 }

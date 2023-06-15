@@ -12,10 +12,10 @@ NEXTVERSION=$(echo ${VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}')
 
 ## GENERAL VAR ##
 FILEPATH=$PWD"/clone"
-TEAMSPATH=$DOCSPATH"/public/data/"
 VITEDUPATH=$FILEPATH"/vite-education"
 VITEPRESSPATH=$FILEPATH"/vite-education/docs/.vitepress"
 DOCSPATH=$FILEPATH"/vite-education/docs/"
+TEAMSPATH=$DOCSPATH"/public/data"
 arr=("")
 organization=""
 
@@ -41,11 +41,12 @@ checkFolder() {
     if [ -d ${FILEPATH} ]; then
         echo -ne "$(printcolor $RED 'Clone folder found' )"
         progressbar 'printcolor' "$RED" 'Deleting' & pid="$!"
-        rm -Rf ${FILEPATH}; 
+        rm -rf ${FILEPATH}; 
         kill -s USR1 "$pid"
         echo -ne "\n"
-        return true
+        return 0
     fi
+    return 1
 }
 
 ## Take the template and clone it in the clone folder  ##
@@ -66,7 +67,8 @@ cloneRepo() {
 ## Update and write the teams of a organization into a file ##
 updateTeams() {
     progressbar 'printcolor' "$CYAN" 'Updating Teams from Organization' & pid="$!"
-    getTeams=$(./$PWD/update-teams update-teams $TEAMSPATH/teams.js ${arr[3]})
+    echo $TEAMSPATH
+    getTeams=$(./update-teams $TEAMSPATH/teams.js ${arr[3]})
     kill -s USR1 "$pid"
 }
 
@@ -86,7 +88,7 @@ basicConfig() {
         arr+=(${opt})
 
         opt=""
-        echo -ne "$(printcolor $CYAN '2)' ) Academic year\n"
+        echo -ne "$(printcolor $CYAN '2)' ) Academic year (xxxx-yyyy)\n"
         echo -ne "   "
         read -r opt
         arr+=(${opt})
@@ -111,8 +113,9 @@ basicConfig() {
     done    
 
     organization=${arr[3]}
-    auth
-    deploy $organization
+    projectid="${arr[1]}-${arr[2]}"
+
+    auth $projectid
     echo -ne "\ec"
 }
 
@@ -130,6 +133,25 @@ npmInstall() {
 
 }
 
+## Refresh firebase configuration file with new project ##
+refreshFirebaseConfig() {
+    fichero="./firebase.js"
+    if [[ -f $fichero ]]; then
+        rm $fichero
+    fi
+    echo "
+import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+const firebaseConfig = " > $fichero
+    firebase apps:sdkconfig WEB --project $1 --json > "./firebase-config.json"
+    cat ./firebase-config.json | jq ".result.sdkConfig" >> $fichero
+    echo "
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+
+export { auth }; " >> $fichero
+}
+
 ## Authentication in firebase + firebase project creation ##
 auth() {
     echo -ne "\n\n$(printcolor $GREEN '# FIREBASE CONFIGURATION #' )\n\n"  
@@ -140,6 +162,7 @@ auth() {
 
     cd $VITEPRESSPATH
 
+    printf "\033c"
     echo -ne "$(printcolor $YELLOW '# FIREBASE LOGIN #' )\n" 
     firebase login
 
@@ -147,11 +170,12 @@ auth() {
 
     options=("Create new project" "List existing projects" "Change current project" "Exit")
 
-    printf "\033c"
     setMenu "# FIREBASE PROJECT CREATION #"
     chooseOption "${options[@]}"
     choice=$?
     exit=1
+    appInfo=""
+    projectID="$1"
     
     while [ $exit != 0 ]
     do
@@ -159,11 +183,7 @@ auth() {
         case $choice in
             0)
                 printf "\033c"
-                echo -ne "$(printcolor $CYAN '# Project ID: (enter for a default name)' )" 
-                echo -ne " more the 6 characters\n -> " 
-                projectID=""
-                read -r projectID
-                echo $projectID
+                echo -ne "$(printcolor $CYAN '# Project ID: ' ) $projectID\n" 
                 firebase projects:create $projectID  
                 firebase use $projectID
                 firebase apps:create WEB $projectID 
@@ -182,6 +202,7 @@ auth() {
                 choice=$?
                 ;;
             2)       
+                firebase projects:list
                 echo -ne "$(printcolor $CYAN '# Project ID to change: ' )"
                 proejctID=""
                 read -r projectID         
@@ -191,7 +212,7 @@ auth() {
         esac
     done
     
-    firebase apps:sdkconfig WEB --project projectID --json > ./firebase-config.json
+    refreshFirebaseConfig $projectID
     echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
     read -r 
 
@@ -223,37 +244,18 @@ function setMenu() {
 
 }
 
-# Template configuration (update teams) #
-templateConfiguration() {
-    echo -en "\ec"
-    options=("Refresh Org Teams" "Exit")
-
-    setMenu "# TEMPLATE CONFIGURATION #"
-    chooseOption "${options[@]}"
-    choice=$?
-    case $choice in
-        0)
-            echo -en "\ec"
-            updateTeams
-            ;;
-        1)
-            echo -ne "$(printcolor $RED 'exiting...' )"
-            echo -ne "\n"
-            exit 0
-            ;;
-    esac
-}
-
 # Initial menú clone or skip #
 initialmenu() {
+
     options=("Clone and config template" "Exit")
-    if [ checkFolder ]; then
-        options=("Clone and config template" "Deploy" "Exit")
+    if [ -d ${FILEPATH} ]; then
+        options=("Clone and config template" "Deploy" "Refresh Teams" "Exit")
     fi
 
     setMenu "# AVAILABLE OPTIONS #"
     chooseOption "${options[@]}"
     choice=$?
+
 
     # TO DO - Add skip if clone exists
 
@@ -265,7 +267,6 @@ initialmenu() {
             echo -en "\ec"
             basicConfig
 
-            templateConfiguration
             ;;
         1)
             echo -ne "\n"
@@ -279,6 +280,11 @@ initialmenu() {
             echo -ne "$(printcolor $RED 'exiting...' )"
             echo -ne "\n"
             exit 0
+            ;;
+
+        2)            
+            echo -en "\ec"
+            updateTeams
             ;;
         *)
             cho -ne "$(printcolor $RED '0)' ) BAD OPTION"
