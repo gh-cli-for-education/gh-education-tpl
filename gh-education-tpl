@@ -209,12 +209,17 @@ auth() {
                 firebase use $projectID
                 exit=0             
                 ;;
+            3)
+                echo -ne "$(printcolor $RED 'exiting...' )"
+                exit=0
+                ;;
         esac
     done
     
     refreshFirebaseConfig $projectID
-    echo -ne "$(printcolor $CYAN '# COPIE LA URL DEL PROYECTO #' )"
-    echo -ne "$(printcolor $CYAN '# Siga el siguiente tutorial: ' https://github.com/gh-cli-for-education/gh-education#tutorial)"
+    echo -ne "$(printcolor $CYAN '# COPY PROYECT URL #' )"
+    echo -ne "$(printcolor $CYAN '# Follow the steps in this tutorial section: ' )"
+    echo -e '\e]8;;https://github.com/gh-cli-for-education/gh-education#tutorial\e\\Tutorial Section link\e]8;;\e\\'
     echo -ne "$(printcolor $YELLOW '# PRESS ENTER TO EXIT #' )\n" 
     read -r 
 
@@ -258,9 +263,6 @@ initialmenu() {
     chooseOption "${options[@]}"
     choice=$?
 
-
-    # TO DO - Add skip if clone exists
-
     case $choice in
         0)
             echo -en "\ec"
@@ -288,6 +290,11 @@ initialmenu() {
             echo -en "\ec"
             updateTeams
             ;;
+        3)
+            echo -ne "$(printcolor $RED 'exiting...' )"
+            exit=0
+            ;;
+
         *)
             cho -ne "$(printcolor $RED '0)' ) BAD OPTION"
             ;;
