@@ -1,6 +1,6 @@
 .\" Manpage for gh-education-tpl script.
 .\" Contact carlosdiazcalzadilla@hotmail.com to correct errors or typos.
-.TH man 8 "27 Jun 2023" "3.0" "gh-education-tpl man page"
+.TH man 8 "27 Jun 2023" "1.0" "gh-education-tpl man page"
 .SH NAME
 gh-education-tpl \- create an online template for teachers
 .SH SYNOPSIS
