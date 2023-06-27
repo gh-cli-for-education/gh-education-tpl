@@ -15,7 +15,6 @@ FILEPATH=$PWD"/clone"
 VITEDUPATH=$FILEPATH"/vite-education"
 VITEPRESSPATH=$FILEPATH"/vite-education/docs/.vitepress"
 DOCSPATH=$FILEPATH"/vite-education/docs/"
-TEAMSPATH=$DOCSPATH"/public/data"
 arr=("")
 organization=""
 
@@ -62,14 +61,6 @@ cloneRepo() {
     cloneCmdRun=$($cloneCmd 2>&1)
     kill -s USR1 "$pid"
     echo -ne "\n $(printcolor $GREEN 'Clone completed succesfullly' ) \n"
-}
-
-## Update and write the teams of a organization into a file ##
-updateTeams() {
-    progressbar 'printcolor' "$CYAN" 'Updating Teams from Organization' & pid="$!"
-    echo $TEAMSPATH
-    getTeams=$(./update-teams $TEAMSPATH/teams.js ${arr[3]})
-    kill -s USR1 "$pid"
 }
 
 ## Project initial configuration ##
@@ -256,7 +247,7 @@ initialmenu() {
 
     options=("Clone and config template" "Exit")
     if [ -d ${FILEPATH} ]; then
-        options=("Clone and config template" "Deploy" "Refresh Teams" "Exit")
+        options=("Clone and config template" "Deploy" "Exit")
     fi
 
     setMenu "# AVAILABLE OPTIONS #"
@@ -285,12 +276,7 @@ initialmenu() {
             echo -ne "\n"
             exit 0
             ;;
-
-        2)            
-            echo -en "\ec"
-            updateTeams
-            ;;
-        3)
+        2)
             echo -ne "$(printcolor $RED 'exiting...' )"
             exit=0
             ;;
